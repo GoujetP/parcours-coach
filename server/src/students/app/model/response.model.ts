@@ -1,3 +1,7 @@
 export interface ResponseModel {
-    letter: string;
+  content: string;
+  responseId: string;
+  promptTokenCount: number;
+  candidatesTokenCount: number;
+  totalTokenCount: number;
 }
