@@ -1,0 +1,31 @@
+<div class="result-container">
+  
+  <div class="result-header">
+    <div class="success-icon">🎉</div>
+    <h2>Votre lettre est <span class="highlight-gradient">prête</span> !</h2>
+    <p>Lisez-la attentivement, ajustez-la si besoin, et copiez-la dans Parcoursup.</p>
+  </div>
+
+  <div class="letter-card">
+    <div class="letter-content">
+      {{ letterContent }}
+    </div>
+  </div>
+
+  <div class="actions-container">
+    <button class="btn-outline" (click)="onReset()">
+      <span class="icon">↺</span> Refaire une lettre
+    </button>
+
+    <button class="btn-primary" [class.copied]="isCopied" (click)="copyToClipboard()" [disabled]="isCopying">
+      @if (isCopying) {
+        <app-loader></app-loader>
+      } @else if (isCopied) {
+        <span class="icon">✅</span> Copié avec succès !
+      } @else {
+        <span class="icon">📋</span> Copier le texte
+      }
+    </button>
+  </div>
+
+</div>

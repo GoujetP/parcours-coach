@@ -15,8 +15,8 @@ export class StudentsAdapter implements AiGeneratorSpi {
         RÈGLES STRICTES ET IMPÉRATIVES :
 
         1. ANONYMAT ABSOLU : Il faut absolument éviter de mentionner l'identité (nom, prénom) du candidat dans la lettre. N'invente aucun nom.
-        2. FORMAT MARKDOWN : Rédige la réponse en utilisant la syntaxe Markdown. Utilise des sauts de ligne pour séparer les paragraphes et mets en gras (**) les compétences ou expériences clés de l'étudiant. Ne mets AUCUNE date et AUCUN en-tête.
-        3. LONGUEUR : Le texte ne doit sous aucun prétexte dépasser 4500 caractères (espaces compris) et doit faire au minimum 2250 caractères. Sois synthétique et percutant.
+        2. FORMAT: Ne mets AUCUNE date et AUCUN en-tête.
+        3. LONGUEUR : Le texte ne doit sous aucun prétexte dépasser 1500 caractères (espaces compris) et doit faire au minimum 1000 caractères soit environ 200/250 motsj. Sois synthétique et percutant.
         4. STRUCTURE : Le texte doit obligatoirement suivre cette structure : une introduction courte d'une phrase, un développement, et une phrase de conclusion avec une formule de politesse (ex: "Je vous remercie par avance de l'attention que vous porterez à ma candidature" ).
         5. VOCABULAIRE EXIGÉ : 
         - Utilise toujours les termes "étudiant" ou "étudiante", n'utilise JAMAIS le mot "élève".
@@ -71,7 +71,7 @@ export class StudentsAdapter implements AiGeneratorSpi {
         `;
         try {
             const response = await this.googleGenAI.models.generateContent({
-                model: "gemini-2.5-flash-lite",
+                model: "gemini-3.1-flash-lite-preview",
                 contents: userMessage,
                 config: {
                     systemInstruction: this.SYSTEM_PROMPT,

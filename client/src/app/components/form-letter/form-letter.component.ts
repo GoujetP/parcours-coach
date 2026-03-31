@@ -1,19 +1,25 @@
-import { Component, inject, signal } from '@angular/core';
+import { Component, CUSTOM_ELEMENTS_SCHEMA, inject, signal, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { GenerateLetterService, LetterResponse } from '../../services/generate-letter.service';
+import { LoaderComponent } from '../loader/loader.component';
+import { LetterResultComponent } from './letter-result/letter-result.component';
 
 @Component({
   selector: 'app-form-letter',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule],
+  imports: [CommonModule, ReactiveFormsModule, LoaderComponent, LetterResultComponent],
   templateUrl: './form-letter.component.html',
-  styleUrls: ['./form-letter.component.scss']
+  styleUrls: ['./form-letter.component.scss'],
+  schemas: [CUSTOM_ELEMENTS_SCHEMA]
 })
-export class FormLetterComponent {
+export class FormLetterComponent implements OnInit {
   private fb = inject(FormBuilder);
   private letterService = inject(GenerateLetterService);
 
+  // État du formulaire
+  showForm = signal(true);
+  
   // État de la lettre générée
   generatedLetter = signal<LetterResponse | null>(null);
   isLoading = signal(false);
@@ -44,6 +50,35 @@ export class FormLetterComponent {
     softSkills: [[] as string[]] // Tableau de strings
   });
 
+  private readonly SESSION_STORAGE_KEY = 'letterFormData';
+
+  ngOnInit() {
+    // Récupérer les données sauvegardées du sessionStorage
+    this.loadFormData();
+    
+    // Écouter les changements du formulaire et les sauvegarder
+    this.letterForm.valueChanges.subscribe(() => {
+      this.saveFormData();
+    });
+  }
+
+  private saveFormData() {
+    const formData = this.letterForm.getRawValue();
+    sessionStorage.setItem(this.SESSION_STORAGE_KEY, JSON.stringify(formData));
+  }
+
+  private loadFormData() {
+    const savedData = sessionStorage.getItem(this.SESSION_STORAGE_KEY);
+    if (savedData) {
+      try {
+        const formData = JSON.parse(savedData);
+        this.letterForm.patchValue(formData);
+      } catch (error) {
+        console.error('Erreur lors du chargement des données:', error);
+      }
+    }
+  }
+
   // --- GESTION DES ÉTIQUETTES (TAGS) ---
   
   addTag(event: Event, controlName: 'specialties' | 'softSkills') {
@@ -64,11 +99,12 @@ export class FormLetterComponent {
     const currentTags = this.letterForm.get(controlName)?.value as string[];
     this.letterForm.get(controlName)?.setValue(currentTags.filter(tag => tag !== tagToRemove));
   }
-
-  // --- SOUMISSION ---
+  
   
   onSubmit() {
     if (this.letterForm.valid) {
+      // Masquer le formulaire et afficher le loader
+      this.showForm.set(false);
       this.isLoading.set(true);
       this.error.set(null);
       this.generatedLetter.set(null);
@@ -86,7 +122,7 @@ export class FormLetterComponent {
         }
       });
     } else {
-      this.letterForm.markAllAsTouched(); // Force l'affichage des erreurs
+      this.letterForm.markAllAsTouched();
     }
   }
 
@@ -108,10 +144,20 @@ export class FormLetterComponent {
   }
 
   resetForm() {
+    // Revenir au formulaire en gardant les données sauvegardées
+    this.showForm.set(true);
+    this.generatedLetter.set(null);
+    this.error.set(null);
+  }
+
+  clearFormData() {
+    // Vider complètement le formulaire et le sessionStorage
+    sessionStorage.removeItem(this.SESSION_STORAGE_KEY);
     this.letterForm.reset({
       specialties: [],
       softSkills: []
     });
+    this.showForm.set(true);
     this.generatedLetter.set(null);
     this.error.set(null);
   }

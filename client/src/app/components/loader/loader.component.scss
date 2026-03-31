@@ -1,0 +1,78 @@
+// Variables de branding issues de ton logo
+$blue-primary: #0A58CA;
+$cyan-secondary: #00E676;
+$slate-200: #E2E8F0;
+$slate-800: #1E293B;
+$slate-500: #64748B;
+
+.loader-section {
+  // Layout : Centrage parfait dans son container
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 4rem 2rem;
+  background-color: #ffffff;
+  border-radius: 16px;
+  border: 1px solid $slate-200;
+  margin-top: 2rem;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05);
+
+  // Animation d'apparition douce de la section entière
+  animation: fadeIn 0.5s ease-out;
+}
+
+.loader {
+  // Taille du loader
+  width: 70px;
+  height: 70px;
+  border-radius: 50%;
+
+  // --- LE SECRET DU LOOK MODERNE ---
+  // On utilise un background gradient conique qui reprend
+  // le dégradé du logo, de la transparence vers les couleurs pleines.
+  background: conic-gradient(
+    from 180deg at 50% 50%,
+    rgba($blue-primary, 0) 0%,
+    $blue-primary 50%,
+    $cyan-secondary 100%
+  );
+
+  // On crée un masque radial pour vider le centre
+  // (uniquement supporté par les navigateurs modernes)
+  -webkit-mask: radial-gradient(farthest-side, transparent calc(100% - 8px), #fff 100%);
+  mask: radial-gradient(farthest-side, transparent calc(100% - 8px), #fff 100%);
+
+  // Animation de rotation fluide (cubic-bezier pour un effet "haut de gamme")
+  animation: rotateLoader 1s cubic-bezier(0.68, -0.55, 0.27, 1.55) infinite;
+
+  position: relative;
+}
+
+.loading-text {
+  margin-top: 2rem;
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: $slate-800;
+  letter-spacing: -0.2px;
+
+  // Effet de clignotement doux sur le texte
+  animation: pulseText 1.5s ease-in-out infinite;
+}
+
+// --- KEYFRAMES ANIMATIONS ---
+
+@keyframes rotateLoader {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+@keyframes pulseText {
+  0%, 100% { opacity: 0.6; transform: scale(0.98); }
+  50% { opacity: 1; transform: scale(1); }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(15px); }
+  to { opacity: 1; transform: translateY(0); }
+}

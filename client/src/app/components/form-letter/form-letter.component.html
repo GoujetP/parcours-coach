@@ -1,10 +1,12 @@
 <div class="form-page-container">
-  <div class="form-header">
-    <h1>Préparons votre <span class="highlight-gradient">Brouillon</span></h1>
-    <p>Remplissez ces informations pour générer une lettre sur-mesure.</p>
-  </div>
+  <!-- SECTION FORMULAIRE -->
+  @if (showForm()) {
+    <div class="form-header">
+      <h1>Préparons votre <span class="highlight-gradient">Brouillon</span></h1>
+      <p>Remplissez ces informations pour générer une lettre sur-mesure.</p>
+    </div>
 
-  <form [formGroup]="letterForm" (ngSubmit)="onSubmit()" class="letter-form">
+    <form [formGroup]="letterForm" (ngSubmit)="onSubmit()" class="letter-form">
 
     <div class="form-card">
       <h2>1. Votre Parcours</h2>
@@ -16,7 +18,6 @@
           <option value="Terminale Générale">Terminale Générale</option>
           <option value="Terminale Technologique">Terminale Technologique</option>
           <option value="Terminale Professionnelle">Terminale Professionnelle</option>
-          <option value="Étudiant en réorientation">Étudiant en réorientation</option>
         </select>
       </div>
 
@@ -149,50 +150,29 @@
         Générer ma lettre par l'IA ✨
       }
     </button>
-  </form>
-
-  <!-- Message d'erreur -->
-  @if (error()) {
-    <div class="error-message">
-      <strong>Erreur:</strong> {{ error() }}
-    </div>
+    </form>
   }
 
-  <!-- Lettre générée -->
-  @if (generatedLetter()) {
-    <div class="letter-result-section">
-      <div class="letter-result-header">
-        <h2>✨ Votre lettre a été générée!</h2>
-        <p>Vous pouvez copier et coller le contenu ci-dessous dans Parcoursup</p>
-      </div>
+  <!-- SECTION RÉSULTAT -->
+  @if (!showForm()) {
+    <div class="result-container">
+      @if (isLoading()) {
+        <app-loader></app-loader>
+      }
 
-      <div class="letter-content">
-        {{ generatedLetter()!.content }}
-      </div>
+      @if (error()) {
+        <div class="error-section">
+          <h2>Erreur</h2>
+          <p>{{ error() }}</p>
+          <button type="button" class="retry-btn" (click)="resetForm()">
+            ← Revenir au formulaire
+          </button>
+        </div>
+      }
 
-      <div class="letter-stats">
-        <div class="stat-item">
-          <span class="stat-label">Tokens utilisés (prompt):</span>
-          <span class="stat-value">{{ generatedLetter()!.promptTokenCount }}</span>
-        </div>
-        <div class="stat-item">
-          <span class="stat-label">Tokens générés:</span>
-          <span class="stat-value">{{ generatedLetter()!.candidatesTokenCount }}</span>
-        </div>
-        <div class="stat-item">
-          <span class="stat-label">Total:</span>
-          <span class="stat-value">{{ generatedLetter()!.totalTokenCount }}</span>
-        </div>
-      </div>
-
-      <div class="letter-actions">
-        <button type="button" class="copy-btn" (click)="copyToClipboard()">
-          📋 Copier le contenu
-        </button>
-        <button type="button" class="new-letter-btn" (click)="resetForm()">
-          ✏️ Générer une autre lettre
-        </button>
-      </div>
+      @if (generatedLetter()) {
+        <app-letter-result [letterContent]="generatedLetter()!.content" (reset)="resetForm()"></app-letter-result>
+      }
     </div>
   }
 </div>
