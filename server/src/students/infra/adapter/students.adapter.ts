@@ -79,9 +79,6 @@ export class StudentsAdapter implements AiGeneratorSpi {
                     maxOutputTokens: 1200,
                 },  
             });
-            console.info("=== FULL RESPONSE OBJECT ===");
-            console.info(JSON.stringify(response, null, 2));
-            console.info("=== END RESPONSE ===");
             return Promise.resolve(this.mapResponseToDto(response));
         } catch (error) {
             return Promise.reject(error);

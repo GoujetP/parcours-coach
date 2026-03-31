@@ -1,0 +1,149 @@
+<div class="form-page-container">
+  <div class="form-header">
+    <h1>Préparons votre <span class="highlight-gradient">Brouillon</span></h1>
+    <p>Remplissez ces informations pour générer une lettre sur-mesure.</p>
+  </div>
+
+  <form [formGroup]="letterForm" (ngSubmit)="onSubmit()" class="letter-form">
+
+    <div class="form-card">
+      <h2>1. Votre Parcours</h2>
+      
+      <div class="form-group">
+        <label>Statut / Type de Bac *</label>
+        <select formControlName="bacType">
+          <option value="" disabled>Sélectionnez votre bac...</option>
+          <option value="Terminale Générale">Terminale Générale</option>
+          <option value="Terminale Technologique">Terminale Technologique</option>
+          <option value="Terminale Professionnelle">Terminale Professionnelle</option>
+          <option value="Étudiant en réorientation">Étudiant en réorientation</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label>Spécialités ou Options (Appuyez sur Entrée pour valider)</label>
+        <input type="text" placeholder="Ex: Mathématiques, NSI..." (keydown.enter)="addTag($event, 'specialties')">
+        
+        <div class="tags-container">
+          @for (tag of letterForm.get('specialties')?.value; track tag) {
+            <span class="tag">
+              {{ tag }}
+              <button type="button" class="remove-tag" (click)="removeTag(tag, 'specialties')">&times;</button>
+            </span>
+          }
+        </div>
+      </div>
+    </div>
+
+    <div class="form-card">
+      <h2>2. La Formation Visée</h2>
+      
+      <div class="form-group">
+        <label>Intitulé exact de la formation *</label>
+        <input type="text" formControlName="targetCourse" placeholder="Ex: BUT Informatique à l'IUT de Lille">
+      </div>
+
+      <div class="form-group">
+        <label>Projet professionnel (Optionnel)</label>
+        <input type="text" formControlName="careerGoal" placeholder="Ex: Devenir développeur web">
+      </div>
+    </div>
+
+    <div class="form-card">
+      <h2>3. Vos Atouts & Démarches</h2>
+
+      <div class="form-group">
+        <label>Avez-vous une expérience professionnelle ?</label>
+        <div class="radio-toggle">
+          <label class="toggle-option">
+            <input type="radio" formControlName="hasWorkExperience" [value]="true">
+            <span>Oui</span>
+          </label>
+          <label class="toggle-option">
+            <input type="radio" formControlName="hasWorkExperience" [value]="false">
+            <span>Non</span>
+          </label>
+        </div>
+      </div>
+
+      @if (letterForm.get('hasWorkExperience')?.value) {
+        <div class="form-group detail-group">
+          <label>Précisez en quelques mots :</label>
+          <input type="text" formControlName="workExperienceDetails" placeholder="Ex: Job d'été en caisse (1 mois)">
+        </div>
+      }
+
+      <div class="form-group">
+        <label>Avez-vous une expérience de bénévolat ?</label>
+        <div class="radio-toggle">
+          <label class="toggle-option">
+            <input type="radio" formControlName="hasVolunteering" [value]="true">
+            <span>Oui</span>
+          </label>
+          <label class="toggle-option">
+            <input type="radio" formControlName="hasVolunteering" [value]="false">
+            <span>Non</span>
+          </label>
+        </div>
+      </div>
+
+      @if (letterForm.get('hasVolunteering')?.value) {
+        <div class="form-group detail-group">
+          <label>Précisez en quelques mots :</label>
+          <input type="text" formControlName="volunteeringDetails" placeholder="Ex: Bénévolat dans une association (6 mois)">
+        </div>
+      }
+
+      <div class="form-group">
+        <label>Pratiquez-vous un sport ou une activité artistique ?</label>
+        <div class="radio-toggle">
+          <label class="toggle-option"><input type="radio" formControlName="hasSportOrArt" [value]="true"><span>Oui</span></label>
+          <label class="toggle-option"><input type="radio" formControlName="hasSportOrArt" [value]="false"><span>Non</span></label>
+        </div>
+      </div>
+      @if (letterForm.get('hasSportOrArt')?.value) {
+        <div class="form-group detail-group">
+          <label>Précisez :</label>
+          <input type="text" formControlName="sportOrArtDetails" placeholder="Ex: Basket en club depuis 5 ans">
+        </div>
+      }
+
+      <div class="form-group">
+        <label>Avez-vous participé aux Portes Ouvertes de l'établissement ?</label>
+        <div class="radio-toggle">
+          <label class="toggle-option"><input type="radio" formControlName="hasAttendedJPO" [value]="true"><span>Oui</span></label>
+          <label class="toggle-option"><input type="radio" formControlName="hasAttendedJPO" [value]="false"><span>Non</span></label>
+        </div>
+      </div>
+      @if (letterForm.get('hasAttendedJPO')?.value) {
+        <div class="form-group detail-group">
+          <label>Avez-vous eu des échanges avec des anciens élèves ?</label>
+            <div class="radio-toggle">
+                <label class="toggle-option"><input type="radio" formControlName="hasSpokenWithAlumni" [value]="true"><span>Oui</span></label>
+                <label class="toggle-option"><input type="radio" formControlName="hasSpokenWithAlumni" [value]="false"><span>Non</span></label>
+            </div>
+        </div>
+      }
+    </div>
+
+    <div class="form-card">
+      <h2>4. Vos Qualités (Soft Skills)</h2>
+      <div class="form-group">
+        <label>Ajoutez 3 qualités principales (Entrée pour valider)</label>
+        <input type="text" placeholder="Ex: Sérieux, Dynamique, Curieux..." (keydown.enter)="addTag($event, 'softSkills')">
+        <div class="tags-container">
+          @for (tag of letterForm.get('softSkills')?.value; track tag) {
+            <span class="tag tag-alt">
+              {{ tag }}
+              <button type="button" class="remove-tag" (click)="removeTag(tag, 'softSkills')">&times;</button>
+            </span>
+          }
+        </div>
+      </div>
+    </div>
+
+    <button type="submit" class="submit-btn" [disabled]="!letterForm.valid">
+      Générer ma lettre par l'IA ✨
+    </button>
+  </form>
+</div>

@@ -1,0 +1,194 @@
+// Variables de la charte graphique (issues du logo)
+$color-primary: #0A58CA;    // Bleu profond
+$color-secondary: #00E676;  // Vert d'eau / Cyan
+$color-text: #2C3E50;
+$color-text-light: #64748B;
+$color-bg: #F8FAFC;
+$color-white: #FFFFFF;
+
+// Typographie et Reset local
+.home-container {
+  font-family: 'Montserrat', sans-serif;
+  color: $color-text;
+  background-color: $color-bg;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+// === EN-TÊTE ET HERO SECTION ===
+.hero-section {
+  background: $color-white;
+  padding: 2rem 1rem 6rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  border-bottom: 1px solid #E2E8F0;
+
+  .logo-container {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 4rem;
+
+    .logo-img {
+      height: 40px;
+      width: auto;
+    }
+
+    .brand-name {
+      font-size: 1.5rem;
+      font-weight: 800;
+      color: $color-primary;
+      letter-spacing: -0.5px;
+    }
+  }
+
+  .hero-content {
+    max-width: 800px;
+    
+    .main-title {
+      font-size: clamp(2.5rem, 5vw, 4rem);
+      font-weight: 800;
+      line-height: 1.15;
+      margin-bottom: 1.5rem;
+      color: #1E293B;
+
+      .highlight-gradient {
+        // Le fameux dégradé du logo appliqué sur le texte
+        background: linear-gradient(135deg, $color-primary 0%, $color-secondary 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+      }
+    }
+
+    .subtitle {
+      font-size: 1.25rem;
+      color: $color-text-light;
+      line-height: 1.6;
+      margin-bottom: 3rem;
+      max-width: 650px;
+      margin-inline: auto;
+    }
+
+    .cta-button {
+      background: linear-gradient(135deg, $color-primary 0%, #0096C7 100%);
+      color: $color-white;
+      border: none;
+      padding: 1.25rem 2.5rem;
+      font-size: 1.25rem;
+      font-weight: 700;
+      border-radius: 50px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.75rem;
+      transition: all 0.3s ease;
+      box-shadow: 0 10px 25px rgba(10, 88, 202, 0.3);
+
+      .icon {
+        width: 24px;
+        height: 24px;
+        transition: transform 0.3s ease;
+      }
+
+      &:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 15px 30px rgba(10, 88, 202, 0.4);
+        background: linear-gradient(135deg, darken($color-primary, 5%) 0%, #00B4D8 100%);
+        
+        .icon {
+          transform: translateX(5px);
+        }
+      }
+    }
+
+    .reassurance {
+      margin-top: 1.5rem;
+      font-size: 0.9rem;
+      color: $color-text-light;
+      font-weight: 500;
+    }
+  }
+}
+
+// === SECTION PRÉSENTATION (LES ÉTAPES) ===
+.features-section {
+  padding: 5rem 1rem;
+  max-width: 1200px;
+  margin: 0 auto;
+  flex: 1;
+
+  .section-title {
+    text-align: center;
+    font-size: 2rem;
+    font-weight: 800;
+    margin-bottom: 3rem;
+    color: #1E293B;
+  }
+
+  .cards-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 2rem;
+
+    .feature-card {
+      background: $color-white;
+      padding: 2.5rem 2rem;
+      border-radius: 20px;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+      border: 1px solid #F1F5F9;
+
+      &:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+      }
+
+      .icon-wrapper {
+        font-size: 3rem;
+        margin-bottom: 1.5rem;
+        display: inline-block;
+      }
+
+      h3 {
+        font-size: 1.25rem;
+        font-weight: 700;
+        margin-bottom: 1rem;
+        color: #1E293B;
+      }
+
+      p {
+        color: $color-text-light;
+        line-height: 1.6;
+        font-size: 1rem;
+      }
+    }
+  }
+}
+
+// === FOOTER ===
+.home-footer {
+  text-align: center;
+  padding: 2rem;
+  background: $color-white;
+  color: $color-text-light;
+  font-size: 0.875rem;
+  border-top: 1px solid #E2E8F0;
+}
+
+// === RESPONSIVE ===
+@media (max-width: 768px) {
+  .hero-section {
+    padding: 2rem 1rem 4rem;
+    
+    .hero-content {
+      .cta-button {
+        width: 100%;
+        justify-content: center;
+      }
+    }
+  }
+}
