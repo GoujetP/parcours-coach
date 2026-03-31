@@ -18,9 +18,7 @@
     </button>
 
     <button class="btn-primary" [class.copied]="isCopied" (click)="copyToClipboard()" [disabled]="isCopying">
-      @if (isCopying) {
-        <app-loader></app-loader>
-      } @else if (isCopied) {
+      @if (isCopied) {
         <span class="icon">✅</span> Copié avec succès !
       } @else {
         <span class="icon">📋</span> Copier le texte
