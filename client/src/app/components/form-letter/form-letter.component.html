@@ -142,8 +142,57 @@
       </div>
     </div>
 
-    <button type="submit" class="submit-btn" [disabled]="!letterForm.valid">
-      Générer ma lettre par l'IA ✨
+    <button type="submit" class="submit-btn" [disabled]="!letterForm.valid || isLoading()">
+      @if (isLoading()) {
+        <span class="loading-spinner"></span> Génération en cours...
+      } @else {
+        Générer ma lettre par l'IA ✨
+      }
     </button>
   </form>
+
+  <!-- Message d'erreur -->
+  @if (error()) {
+    <div class="error-message">
+      <strong>Erreur:</strong> {{ error() }}
+    </div>
+  }
+
+  <!-- Lettre générée -->
+  @if (generatedLetter()) {
+    <div class="letter-result-section">
+      <div class="letter-result-header">
+        <h2>✨ Votre lettre a été générée!</h2>
+        <p>Vous pouvez copier et coller le contenu ci-dessous dans Parcoursup</p>
+      </div>
+
+      <div class="letter-content">
+        {{ generatedLetter()!.content }}
+      </div>
+
+      <div class="letter-stats">
+        <div class="stat-item">
+          <span class="stat-label">Tokens utilisés (prompt):</span>
+          <span class="stat-value">{{ generatedLetter()!.promptTokenCount }}</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-label">Tokens générés:</span>
+          <span class="stat-value">{{ generatedLetter()!.candidatesTokenCount }}</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-label">Total:</span>
+          <span class="stat-value">{{ generatedLetter()!.totalTokenCount }}</span>
+        </div>
+      </div>
+
+      <div class="letter-actions">
+        <button type="button" class="copy-btn" (click)="copyToClipboard()">
+          📋 Copier le contenu
+        </button>
+        <button type="button" class="new-letter-btn" (click)="resetForm()">
+          ✏️ Générer une autre lettre
+        </button>
+      </div>
+    </div>
+  }
 </div>

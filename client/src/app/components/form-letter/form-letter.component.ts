@@ -1,6 +1,7 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { GenerateLetterService, LetterResponse } from '../../services/generate-letter.service';
 
 @Component({
   selector: 'app-form-letter',
@@ -11,6 +12,12 @@ import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angula
 })
 export class FormLetterComponent {
   private fb = inject(FormBuilder);
+  private letterService = inject(GenerateLetterService);
+
+  // État de la lettre générée
+  generatedLetter = signal<LetterResponse | null>(null);
+  isLoading = signal(false);
+  error = signal<string | null>(null);
 
   // Initialisation du formulaire
   letterForm: FormGroup = this.fb.group({
@@ -62,10 +69,50 @@ export class FormLetterComponent {
   
   onSubmit() {
     if (this.letterForm.valid) {
-      console.log('Données prêtes pour NestJS :', this.letterForm.value);
-      // Ici, tu pourras appeler ton service HTTP vers ton back-end NestJS
+      this.isLoading.set(true);
+      this.error.set(null);
+      this.generatedLetter.set(null);
+
+      this.letterService.generateLetter(this.letterForm.value).subscribe({
+        next: (response: LetterResponse) => {
+          this.generatedLetter.set(response);
+          this.isLoading.set(false);
+          console.log('Lettre générée avec succès:', response);
+        },
+        error: (err) => {
+          this.isLoading.set(false);
+          this.error.set(err.error?.message || 'Une erreur est survenue lors de la génération de la lettre');
+          console.error('Erreur:', err);
+        }
+      });
     } else {
       this.letterForm.markAllAsTouched(); // Force l'affichage des erreurs
     }
+  }
+
+  // --- ACTIONS SUR LA LETTRE GÉNÉRÉE ---
+
+  copyToClipboard() {
+    const content = this.generatedLetter()?.content;
+    if (content) {
+      navigator.clipboard.writeText(content).then(
+        () => {
+          console.log('Lettre copiée dans le presse-papiers');
+          // Optionnel: afficher un message de confirmation
+        },
+        (err) => {
+          console.error('Erreur lors de la copie:', err);
+        }
+      );
+    }
+  }
+
+  resetForm() {
+    this.letterForm.reset({
+      specialties: [],
+      softSkills: []
+    });
+    this.generatedLetter.set(null);
+    this.error.set(null);
   }
 }
