@@ -26,6 +26,11 @@ export class LetterResultComponent {
       await navigator.clipboard.writeText(this.letterContent);
       this.isCopying = false;
       this.isCopied = true;
+      
+      // Remet le bouton à son état normal après 2.5 secondes
+      setTimeout(() => {
+        this.isCopied = false;
+      }, 2500);
     } catch (err) {
       console.error('Échec de la copie :', err);
       alert('Impossible de copier le texte automatiquement.');

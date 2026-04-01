@@ -1,4 +1,4 @@
-import { Component, CUSTOM_ELEMENTS_SCHEMA, inject, signal, OnInit } from '@angular/core';
+import { Component, CUSTOM_ELEMENTS_SCHEMA, inject, signal, OnInit, afterNextRender } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { GenerateLetterService, LetterResponse } from '../../services/generate-letter.service';
@@ -52,10 +52,13 @@ export class FormLetterComponent implements OnInit {
 
   private readonly SESSION_STORAGE_KEY = 'letterFormData';
 
-  ngOnInit() {
-    // Récupérer les données sauvegardées du sessionStorage
-    this.loadFormData();
-    
+  constructor() {
+    // Cette fonction dit à Angular : "Attends d'être sur un vrai navigateur pour lancer ça"
+    afterNextRender(() => {
+      this.loadFormData();
+    });
+  }
+  ngOnInit() {    
     // Écouter les changements du formulaire et les sauvegarder
     this.letterForm.valueChanges.subscribe(() => {
       this.saveFormData();

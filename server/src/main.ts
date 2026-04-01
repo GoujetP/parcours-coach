@@ -8,10 +8,9 @@ async function bootstrap() {
 
   // Configuration CORS pour permettre les requêtes du client Angular
   app.enableCors({
-    origin: process.env.CORS_ORIGIN || 'http://localhost:4200',
+    origin: '*',
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization'],
-    credentials: true,
   });
 
   await app.listen(process.env.PORT ?? 3000);
