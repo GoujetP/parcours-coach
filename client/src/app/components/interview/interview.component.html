@@ -1,0 +1,108 @@
+<div class="interview-container">
+  <header class="interview-header">
+    <a routerLink="/" class="back-link">← Accueil</a>
+    <span class="brand-name">Simulateur d'entretien</span>
+  </header>
+
+  <!-- ÉTAPE 1 : Configuration -->
+  @if (phase() === 'config') {
+    <section class="config-card">
+      <h1 class="title">Préparez votre <span class="highlight">oral d'admission</span></h1>
+      <p class="subtitle">
+        Un jury IA vous fait passer un entretien vocal. Parlez, il vous répond à voix haute.
+      </p>
+
+      <form [formGroup]="configForm" (ngSubmit)="start()">
+        <label>
+          Votre prénom
+          <input type="text" formControlName="firstName" placeholder="Ex : Camille" />
+        </label>
+
+        <label>
+          École / Établissement visé
+          <input type="text" formControlName="school" placeholder="Ex : Sciences Po Paris" />
+        </label>
+
+        <label>
+          Formation visée
+          <input type="text" formControlName="targetCourse" placeholder="Ex : Bachelor en sciences sociales" />
+        </label>
+
+        <label>
+          Style du jury
+          <select formControlName="style">
+            <option value="bienveillant mais exigeant">Bienveillant mais exigeant</option>
+            <option value="strict et formel">Strict et formel</option>
+            <option value="chaleureux et encourageant">Chaleureux et encourageant</option>
+          </select>
+        </label>
+
+        <label>
+          Type d'entretien
+          <select formControlName="interviewType">
+            <option value="entretien de motivation">Entretien de motivation</option>
+            <option value="entretien de personnalité">Entretien de personnalité</option>
+            <option value="entretien technique">Entretien technique</option>
+          </select>
+        </label>
+
+        @if (error()) {
+          <p class="error-banner">{{ error() }}</p>
+        }
+
+        <button type="submit" class="cta-button" [disabled]="configForm.invalid">
+          Démarrer l'entretien
+        </button>
+      </form>
+    </section>
+  }
+
+  <!-- ÉTAPE 2 : Entretien en direct -->
+  @if (phase() === 'live') {
+    <section class="live-stage">
+      <p class="status">{{ status() }}</p>
+
+      <div
+        class="orb"
+        [class.speaking]="isJurySpeaking()"
+        [class.listening]="isRecording()"
+        [style.transform]="'scale(' + (1 + amplitude() * 0.45) + ')'"
+      >
+        <div class="orb-glow" [style.opacity]="0.35 + amplitude() * 0.65"></div>
+        <div class="orb-core"></div>
+      </div>
+
+      <div class="captions">
+        @if (studentCaption()) {
+          <p class="student-line">« {{ studentCaption() }} »</p>
+        }
+        <p class="jury-line">{{ caption() }}<span class="cursor" [class.blink]="isJurySpeaking()"></span></p>
+      </div>
+
+      @if (error()) {
+        <p class="error-banner">{{ error() }}</p>
+      }
+
+      <div class="controls">
+        <button
+          class="mic-button"
+          [class.recording]="isRecording()"
+          [disabled]="isJuryThinking()"
+          (mousedown)="startRecording()"
+          (mouseup)="stopRecording()"
+          (mouseleave)="stopRecording()"
+          (touchstart)="startRecording()"
+          (touchend)="stopRecording()"
+        >
+          @if (isRecording()) {
+            🔴 Relâchez pour envoyer
+          } @else {
+            🎤 Maintenez pour parler
+          }
+        </button>
+
+        <button class="restart-button" (click)="restart()">Recommencer</button>
+      </div>
+    </section>
+  }
+</div>

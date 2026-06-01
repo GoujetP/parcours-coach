@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <title>Test entretien vocal</title>
+  <script src="https://cdn.socket.io/4.8.1/socket.io.min.js"></script>
+  <style>
+    body { font-family: system-ui, sans-serif; max-width: 700px; margin: 40px auto; padding: 0 16px; }
+    label { display: block; margin-top: 8px; font-weight: 600; }
+    input { width: 100%; padding: 6px; margin-top: 2px; }
+    button { margin-top: 16px; padding: 10px 18px; font-size: 15px; cursor: pointer; }
+    #log { margin-top: 24px; white-space: pre-wrap; background: #f4f4f4; padding: 16px; border-radius: 8px; min-height: 80px; }
+    .jury { color: #1a5; } .student { color: #25a; } .err { color: #c00; }
+  </style>
+</head>
+<body>
+  <h1>Test entretien vocal</h1>
+
+  <label>Prénom<input id="firstName" value="Camille" /></label>
+  <label>École<input id="school" value="Sciences Po Paris" /></label>
+  <label>Formation visée<input id="targetCourse" value="Bachelor en sciences sociales" /></label>
+  <label>Style du jury<input id="style" value="bienveillant mais exigeant" /></label>
+  <label>Type d'entretien<input id="interviewType" value="entretien de motivation" /></label>
+
+  <div>
+    <button id="start">1. Commencer l'entretien</button>
+    <button id="record" disabled>2. Parler (maintenir pour enregistrer)</button>
+  </div>
+
+  <div id="log"></div>
+
+  <script>
+    const log = (msg, cls = '') => {
+      const el = document.getElementById('log');
+      el.innerHTML += `<div class="${cls}">${msg}</div>`;
+    };
+
+    const getContext = () => ({
+      firstName: document.getElementById('firstName').value,
+      school: document.getElementById('school').value,
+      targetCourse: document.getElementById('targetCourse').value,
+      style: document.getElementById('style').value,
+      interviewType: document.getElementById('interviewType').value,
+    });
+
+    const socket = io('http://localhost:3000/interview');
+    const history = [];
+
+    socket.on('connect', () => log('✅ Connecté au serveur (' + socket.id + ')'));
+    socket.on('connect_error', (e) => log('❌ Connexion impossible : ' + e.message, 'err'));
+    socket.on('interview_error', (e) => log('❌ Jury : ' + e.message, 'err'));
+
+    // --- Streaming : file d'attente audio + accumulation du texte du jury ---
+    let juryBuffer = '';
+    const audioQueue = [];
+    let playingQ = false;
+    const playQ = () => {
+      if (audioQueue.length === 0) { playingQ = false; return; }
+      playingQ = true;
+      const audio = new Audio('data:audio/wav;base64,' + audioQueue.shift());
+      audio.onended = playQ;
+      audio.onerror = playQ;
+      audio.play().catch(playQ);
+    };
+
+    socket.on('jury_transcript', (e) => {
+      log('🎓 Vous : ' + e.studentTranscript, 'student');
+      history.push({ role: 'user', text: e.studentTranscript });
+    });
+
+    socket.on('jury_chunk', (e) => {
+      document.getElementById('record').disabled = false;
+      log('⚖️ Jury : ' + e.text, 'jury');
+      juryBuffer += e.text + ' ';
+      if (e.audioBase64) {
+        audioQueue.push(e.audioBase64);
+        if (!playingQ) playQ();
+      }
+    });
+
+    socket.on('jury_done', () => {
+      if (juryBuffer.trim()) history.push({ role: 'model', text: juryBuffer.trim() });
+      juryBuffer = '';
+    });
+
+    document.getElementById('start').onclick = () => {
+      log('⏳ Démarrage...');
+      history.length = 0;
+      juryBuffer = '';
+      socket.emit('start_interview', getContext());
+    };
+
+    // --- Micro (nécessite localhost ou https) ---
+    let mediaRecorder, chunks = [];
+    const recordBtn = document.getElementById('record');
+
+    async function ensureRecorder() {
+      if (mediaRecorder) return;
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      mediaRecorder = new MediaRecorder(stream);
+      mediaRecorder.ondataavailable = (e) => chunks.push(e.data);
+      mediaRecorder.onstop = async () => {
+        const blob = new Blob(chunks, { type: mediaRecorder.mimeType });
+        chunks = [];
+        const buf = await blob.arrayBuffer();
+        let bin = '';
+        new Uint8Array(buf).forEach((b) => (bin += String.fromCharCode(b)));
+        const audioBase64 = btoa(bin);
+        log('⏳ Envoi de votre réponse...');
+        juryBuffer = '';
+        socket.emit('student_speaks', {
+          audioBase64,
+          mimeType: mediaRecorder.mimeType,
+          context: getContext(),
+          history,
+        });
+      };
+    }
+
+    const startRec = async () => {
+      try {
+        await ensureRecorder();
+        chunks = [];
+        mediaRecorder.start();
+        recordBtn.textContent = '🔴 Enregistrement... (relâcher pour envoyer)';
+      } catch (e) { log('❌ Micro : ' + e.message, 'err'); }
+    };
+    const stopRec = () => {
+      if (mediaRecorder && mediaRecorder.state === 'recording') mediaRecorder.stop();
+      recordBtn.textContent = '2. Parler (maintenir pour enregistrer)';
+    };
+    recordBtn.addEventListener('mousedown', startRec);
+    recordBtn.addEventListener('mouseup', stopRec);
+    recordBtn.addEventListener('mouseleave', stopRec);
+  </script>
+</body>
+</html>

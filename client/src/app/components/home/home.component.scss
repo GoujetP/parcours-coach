@@ -105,6 +105,25 @@ $color-white: #FFFFFF;
       }
     }
 
+    .cta-group {
+      display: flex;
+      gap: 1rem;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    .cta-outline {
+      background: $color-white;
+      color: $color-primary;
+      box-shadow: 0 4px 12px rgba(10, 88, 202, 0.12);
+      border: 2px solid $color-primary;
+
+      &:hover {
+        background: $color-primary;
+        color: $color-white;
+      }
+    }
+
     .reassurance {
       margin-top: 1.5rem;
       font-size: 0.9rem;

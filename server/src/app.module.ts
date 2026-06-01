@@ -2,6 +2,7 @@ import { Module } from '@nestjs/common';
 import { ThrottlerModule, ThrottlerGuard } from '@nestjs/throttler';
 import { APP_GUARD } from '@nestjs/core';
 import { StudentsModule } from './students/students.module';
+import { InterviewModule } from './interview/interview.module';
 
 @Module({
   imports: [
@@ -13,6 +14,7 @@ import { StudentsModule } from './students/students.module';
       },
     ]),
     StudentsModule,
+    InterviewModule,
   ],
   controllers: [],
   providers: [
